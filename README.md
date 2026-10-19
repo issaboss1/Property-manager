@@ -1,6 +1,6 @@
 # Property Manager
 
-A small web app that automates the routine work of managing rental units: receipts, rent reminders, lease renewals and maintenance schedules. Built for a 4-unit rental property in Trinidad and Tobago.
+A small web app that automates the routine work of managing rental units: receipts, rent reminders, lease renewals and maintenance schedules. Built for rental properties in Trinidad and Tobago.
 
 ![Dashboard](docs/dashboard.png)
 
@@ -27,7 +27,7 @@ Each reminder is sent only once per stage. Reminders go out every morning at 8am
 Double-click **start.bat**. It installs what's needed, creates your `.env` settings file and opens http://localhost:5000.
 
 Then:
-1. **Units**: add your 4 units.
+1. **Units**: add your units.
 2. **Tenants**: add each tenant with their rent, due day, lease dates, WhatsApp and email.
 3. **Servicing**: add each AC unit with the date it was last serviced.
 4. Open `.env` in Notepad and fill in your business name and contact details. Restart the app after any change.
