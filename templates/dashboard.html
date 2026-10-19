@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="row"><h1>Dashboard</h1><span class="muted">{{ today.strftime('%A %d %B %Y') }}</span></div>
+
+<div class="stats">
+  <div class="stat"><span class="muted">Collected · {{ period|period }}</span><b>{{ collected|money }}</b></div>
+  <div class="stat"><span class="muted">Expected</span><b>{{ expected|money }}</b></div>
+  <div class="stat"><span class="muted">Outstanding</span><b>{{ ((expected - collected) if expected > collected else 0)|money }}</b></div>
+  <div class="stat"><span class="muted">Needs attention</span><b>{{ alerts|selectattr('level', 'ne', 'info')|list|length }}</b></div>
+</div>
+
+<div class="card">
+  <div class="row"><h2>Needs attention</h2>
+    <form class="inline" method="post" action="{{ url_for('reminders_run') }}">
+      <button class="btn sm ghost" title="Reminders also go out automatically every morning">Send reminders now</button>
+    </form>
+  </div>
+  {% for a in alerts %}
+    <div class="alert"><span class="pill {{ a.level }}">{{ a.kind }}</span>
+      <span>{{ a.message }}{% if a.tenant_id %} <a href="{{ url_for('tenant_detail', tenant_id=a.tenant_id) }}">View</a>{% endif %}</span></div>
+  {% else %}
+    <p class="muted">All clear. No leases ending soon, no late rent, no servicing due.</p>
+  {% endfor %}
+</div>
+
+<div class="card">
+  <h2>Rent for {{ period|period }}</h2>
+  <div class="scroll"><table>
+    <tr><th>Tenant</th><th>Unit</th><th>Due</th><th class="num">Rent</th><th class="num">Paid</th><th>Status</th><th></th></tr>
+    {% for r in rent_rows %}
+    <tr>
+      <td><a href="{{ url_for('tenant_detail', tenant_id=r.t.id) }}">{{ r.t.name }}</a></td>
+      <td>{{ r.t.unit_name or '-' }}</td>
+      <td>{{ r.due.strftime('%d %b') }}</td>
+      <td class="num">{{ r.t.rent_amount|money }}</td>
+      <td class="num">{{ r.paid|money }}</td>
+      <td><span class="pill {{ r.status }}">{{ r.status }}</span></td>
+      <td class="num">{% if r.balance > 0 %}<a class="btn sm" href="{{ url_for('payment_form', tenant_id=r.t.id) }}">Record payment</a>{% endif %}</td>
+    </tr>
+    {% else %}
+    <tr><td colspan="7" class="muted">No tenants yet. Start by <a href="{{ url_for('unit_form') }}">adding your units</a>, then <a href="{{ url_for('tenant_form') }}">your tenants</a>.</td></tr>
+    {% endfor %}
+  </table></div>
+</div>
+
+<div class="card">
+  <h2>Recent payments</h2>
+  <div class="scroll"><table>
+    <tr><th>Date</th><th>Tenant</th><th>For</th><th>Method</th><th class="num">Amount</th><th></th></tr>
+    {% for p in recent %}
+    <tr><td>{{ p.paid_on }}</td><td>{{ p.tenant_name }}</td><td>{{ p.period|period }}</td>
+        <td>{{ 'Bank' if p.method == 'bank' else 'Cash' }}</td><td class="num">{{ p.amount|money }}</td>
+        <td class="num"><a href="{{ url_for('payment_receipt', payment_id=p.id) }}" target="_blank">{{ p.receipt_no }}</a></td></tr>
+    {% else %}
+    <tr><td colspan="6" class="muted">No payments recorded yet.</td></tr>
+    {% endfor %}
+  </table></div>
+</div>
+{% endblock %}

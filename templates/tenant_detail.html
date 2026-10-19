@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="row">
+  <h1>{{ tenant.name }}{% if not tenant.active %} <span class="muted">(former tenant)</span>{% endif %}</h1>
+  <div><a class="btn" href="{{ url_for('payment_form', tenant_id=tenant.id) }}">+ Record payment</a>
+       <a class="btn ghost" href="{{ url_for('tenant_form', tenant_id=tenant.id) }}">Edit</a></div>
+</div>
+
+<div class="card grid">
+  <div><span class="muted">Unit</span><br><b>{{ tenant.unit_name or '-' }}</b></div>
+  <div><span class="muted">Rent</span><br><b>{{ tenant.rent_amount|money }}</b> on day {{ tenant.rent_due_day }}</div>
+  <div><span class="muted">Lease</span><br><b>{{ tenant.lease_start or '?' }} to {{ tenant.lease_end or '?' }}</b></div>
+  <div><span class="muted">Deposit held</span><br><b>{{ (tenant.deposit or 0)|money }}</b></div>
+  <div><span class="muted">WhatsApp</span><br>{{ tenant.whatsapp or '-' }}</div>
+  <div><span class="muted">Email</span><br>{{ tenant.email or '-' }}</div>
+  {% if tenant.notes %}<div style="grid-column:1/-1"><span class="muted">Notes</span><br>{{ tenant.notes }}</div>{% endif %}
+</div>
+
+<div class="card">
+  <div class="row"><h2>Payment history</h2><span class="muted">Total received: {{ total|money }}</span></div>
+  <div class="scroll"><table>
+    <tr><th>Date</th><th>For</th><th>Method</th><th>Ref</th><th class="num">Amount</th><th>Receipt</th><th></th></tr>
+    {% for p in payments %}
+    <tr><td>{{ p.paid_on }}</td><td>{{ p.period|period }}</td><td>{{ 'Bank' if p.method == 'bank' else 'Cash' }}</td>
+        <td class="muted">{{ p.reference or '' }}</td><td class="num">{{ p.amount|money }}</td>
+        <td><a href="{{ url_for('payment_receipt', payment_id=p.id) }}" target="_blank">{{ p.receipt_no }}</a></td>
+        <td class="num" style="white-space:nowrap">
+          <form class="inline" method="post" action="{{ url_for('payment_resend', payment_id=p.id) }}"><button class="btn sm ghost">Resend</button></form>
+          <form class="inline" method="post" action="{{ url_for('payment_delete', payment_id=p.id) }}"
+                onsubmit="return confirm('Delete payment {{ p.receipt_no }}? Only do this if it was entered by mistake.')"><button class="btn sm danger">Delete</button></form>
+        </td></tr>
+    {% else %}
+    <tr><td colspan="7" class="muted">No payments yet.</td></tr>
+    {% endfor %}
+  </table></div>
+</div>
+{% endblock %}

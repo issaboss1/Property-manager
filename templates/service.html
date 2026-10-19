@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Servicing</h1>
+<p class="muted">Anything that needs regular upkeep: AC units, fire extinguishers, water tanks, pest control, gas checks. You'll get a reminder 14 and 7 days before each is due.</p>
+
+<div class="card scroll"><table>
+  <tr><th>Item</th><th>Unit</th><th>Every</th><th>Last done</th><th>Next due</th><th>Mark as done</th><th></th></tr>
+  {% for i in items %}
+  <tr>
+    <td><b>{{ i.s.name }}</b>{% if i.s.notes %}<br><span class="muted">{{ i.s.notes }}</span>{% endif %}</td>
+    <td>{{ i.s.unit_name or '-' }}</td>
+    <td>{{ i.s.interval_months }} mo</td>
+    <td>{{ i.s.last_serviced or 'Never' }}</td>
+    <td>{{ i.next_due.strftime('%d %b %Y') }}
+      {% if i.days < 0 %}<span class="pill urgent">Overdue</span>{% elif i.days <= 7 %}<span class="pill urgent">Soon</span>{% elif i.days <= 14 %}<span class="pill soon">Upcoming</span>{% endif %}</td>
+    <td>
+      <form method="post" action="{{ url_for('service_done', item_id=i.s.id) }}" style="display:flex;gap:6px;min-width:330px">
+        <input name="serviced_on" type="date" value="{{ today.isoformat() }}" style="width:140px">
+        <input name="cost" type="number" step="0.01" placeholder="Cost TT$" style="width:95px">
+        <button class="btn sm">Done</button>
+      </form></td>
+    <td><form class="inline" method="post" action="{{ url_for('service_delete', item_id=i.s.id) }}"
+              onsubmit="return confirm('Remove {{ i.s.name }}?')"><button class="btn sm danger">Remove</button></form></td>
+  </tr>
+  {% else %}
+  <tr><td colspan="7" class="muted">Nothing yet. Add your AC units below.</td></tr>
+  {% endfor %}
+</table></div>
+
+<form method="post" action="{{ url_for('service_new') }}" class="card">
+  <h2>Add item</h2>
+  <div class="grid">
+    <div><label>What</label><input name="name" required placeholder="e.g. Bedroom AC"></div>
+    <div><label>Unit</label><select name="unit_id"><option value="">-</option>
+      {% for u in units %}<option value="{{ u.id }}">{{ u.name }}</option>{% endfor %}</select></div>
+    <div><label>Service every (months)</label><input name="interval_months" type="number" min="1" value="6"></div>
+    <div><label>Last serviced</label><input name="last_serviced" type="date"></div>
+  </div>
+  <p><label>Notes</label><input name="notes" placeholder="e.g. 12,000 BTU, technician: ..."></p>
+  <button class="btn">Add</button>
+</form>
+
+{% if log %}
+<div class="card scroll"><h2>Service history</h2><table>
+  <tr><th>Date</th><th>Item</th><th>Unit</th><th class="num">Cost</th></tr>
+  {% for l in log %}<tr><td>{{ l.serviced_on }}</td><td>{{ l.item_name }}</td><td>{{ l.unit_name or '-' }}</td>
+    <td class="num">{{ l.cost|money if l.cost is not none else '-' }}</td></tr>{% endfor %}
+</table></div>
+{% endif %}
+{% endblock %}

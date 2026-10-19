@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="row"><h1>Tenants</h1><a class="btn" href="{{ url_for('tenant_form') }}">+ Add tenant</a></div>
+<div class="card scroll"><table>
+  <tr><th>Name</th><th>Unit</th><th class="num">Rent</th><th>Lease ends</th><th>Contact</th><th></th></tr>
+  {% for t in tenants %}
+  <tr style="{{ 'opacity:.5' if not t.active }}">
+    <td><a href="{{ url_for('tenant_detail', tenant_id=t.id) }}"><b>{{ t.name }}</b></a>{% if not t.active %} <span class="muted">(former)</span>{% endif %}</td>
+    <td>{{ t.unit_name or '-' }}</td>
+    <td class="num">{{ t.rent_amount|money }}</td>
+    <td>{{ t.lease_end or '-' }}</td>
+    <td class="muted">{{ t.whatsapp or '' }}{% if t.whatsapp and t.email %}<br>{% endif %}{{ t.email or '' }}</td>
+    <td class="num"><a class="btn sm ghost" href="{{ url_for('tenant_form', tenant_id=t.id) }}">Edit</a></td>
+  </tr>
+  {% else %}
+  <tr><td colspan="6" class="muted">No tenants yet.</td></tr>
+  {% endfor %}
+</table></div>
+{% endblock %}

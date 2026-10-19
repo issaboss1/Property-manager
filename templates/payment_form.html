@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Record a payment</h1>
+<form method="post" class="card">
+  <div class="grid">
+    <div><label>Tenant</label>
+      <select name="tenant_id" id="tenant" required>
+        <option value="">Choose...</option>
+        {% for t in tenants %}
+        <option value="{{ t.id }}" data-rent="{{ t.rent_amount }}" {{ 'selected' if selected == t.id }}>{{ t.name }} · {{ t.unit_name or 'no unit' }}</option>
+        {% endfor %}
+      </select></div>
+    <div><label>Amount (TT$)</label><input name="amount" id="amount" type="number" step="0.01" min="0.01" required></div>
+    <div><label>Method</label>
+      <select name="method" id="method"><option value="cash">Cash</option><option value="bank">Bank transfer</option></select></div>
+    <div id="refbox"><label>Bank reference (optional)</label><input name="reference" placeholder="Transaction / confirmation no."></div>
+    <div><label>Date received</label><input name="paid_on" type="date" value="{{ today.isoformat() }}" required></div>
+    <div><label>Rent for month</label><input name="period" type="month" value="{{ period }}" required></div>
+  </div>
+  <p><label>Note on receipt (optional)</label><input name="notes" placeholder="e.g. Includes TT$200 late fee"></p>
+  <p>
+    {% if whatsapp_on %}<label class="check"><input type="checkbox" name="send_whatsapp" checked> Send receipt by WhatsApp</label>{% endif %}
+    <label class="check"><input type="checkbox" name="send_email" checked> Send receipt by email</label>
+  </p>
+  <button class="btn">Save & send receipt</button>
+</form>
+<script>
+  const tenant = document.getElementById('tenant'), amount = document.getElementById('amount');
+  const method = document.getElementById('method'), refbox = document.getElementById('refbox');
+  function fillRent() { const o = tenant.selectedOptions[0]; if (o && o.dataset.rent && !amount.value) amount.value = o.dataset.rent; }
+  function toggleRef() { refbox.style.visibility = method.value === 'bank' ? 'visible' : 'hidden'; }
+  tenant.addEventListener('change', () => { amount.value = ''; fillRent(); });
+  method.addEventListener('change', toggleRef);
+  fillRent(); toggleRef();
+</script>
+{% endblock %}

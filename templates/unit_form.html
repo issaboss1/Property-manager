@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>{{ 'Edit unit' if unit else 'Add unit' }}</h1>
+<form method="post" class="card">
+  <div class="grid">
+    <div><label>Unit name</label><input name="name" required placeholder="e.g. Apt 1, Upstairs" value="{{ unit.name if unit }}"></div>
+    <div><label>Address</label><input name="address" placeholder="e.g. 12 Main Rd, San Fernando" value="{{ unit.address if unit and unit.address }}"></div>
+  </div>
+  <p><label>Notes</label><textarea name="notes" rows="2">{{ unit.notes if unit and unit.notes }}</textarea></p>
+  <button class="btn">Save</button> <a href="{{ url_for('units') }}" class="btn ghost">Cancel</a>
+</form>
+{% endblock %}

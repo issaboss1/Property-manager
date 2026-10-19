@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{% block title %}{{ business_name }}{% endblock %}</title>
+<style>
+  :root { --bg:#f5f6f8; --card:#fff; --text:#1d2433; --muted:#667085; --line:#e4e7ec;
+          --brand:#1e4078; --ok:#067647; --ok-bg:#ecfdf3; --warn:#b54708; --warn-bg:#fffaeb;
+          --bad:#b42318; --bad-bg:#fef3f2; --info-bg:#eff4ff; }
+  * { box-sizing: border-box; }
+  body { margin:0; font:15px/1.5 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; background:var(--bg); color:var(--text); }
+  header { background:var(--brand); color:#fff; }
+  header .wrap { display:flex; flex-wrap:wrap; gap:4px 18px; align-items:center; padding:12px 16px; }
+  header strong { font-size:17px; margin-right:auto; }
+  header a { color:#dbe4f5; text-decoration:none; font-weight:500; }
+  header a:hover, header a.on { color:#fff; }
+  .wrap { max-width:1000px; margin:0 auto; padding:16px; }
+  h1 { font-size:22px; margin:8px 0 16px; }
+  h2 { font-size:17px; margin:0 0 12px; }
+  .card { background:var(--card); border:1px solid var(--line); border-radius:10px; padding:16px; margin-bottom:16px; }
+  .row { display:flex; flex-wrap:wrap; gap:12px; align-items:center; justify-content:space-between; }
+  .muted { color:var(--muted); font-size:13px; }
+  table { width:100%; border-collapse:collapse; }
+  th, td { text-align:left; padding:8px 6px; border-bottom:1px solid var(--line); vertical-align:middle; }
+  th { font-size:12px; text-transform:uppercase; letter-spacing:.03em; color:var(--muted); font-weight:600; }
+  .num { text-align:right; font-variant-numeric:tabular-nums; }
+  .scroll { overflow-x:auto; }
+  a { color:var(--brand); }
+  .btn { display:inline-block; background:var(--brand); color:#fff; border:0; border-radius:7px; padding:8px 14px;
+         font:inherit; font-weight:600; cursor:pointer; text-decoration:none; white-space:nowrap; }
+  .btn.sm { padding:4px 10px; font-size:13px; }
+  .btn.ghost { background:transparent; color:var(--brand); border:1px solid var(--line); }
+  .btn.danger { background:transparent; color:var(--bad); border:1px solid var(--line); }
+  form.inline { display:inline; }
+  .pill { display:inline-block; padding:2px 9px; border-radius:99px; font-size:12px; font-weight:600; }
+  .pill.Paid { background:var(--ok-bg); color:var(--ok); }
+  .pill.Due, .pill.soon { background:var(--warn-bg); color:var(--warn); }
+  .pill.Partial { background:var(--info-bg); color:var(--brand); }
+  .pill.Late, .pill.urgent { background:var(--bad-bg); color:var(--bad); }
+  .pill.info { background:var(--info-bg); color:var(--brand); }
+  .alert { display:flex; gap:10px; align-items:flex-start; padding:9px 0; border-bottom:1px solid var(--line); }
+  .alert:last-child { border-bottom:0; }
+  .flash { background:var(--ok-bg); color:var(--ok); border:1px solid #abefc6; padding:10px 14px; border-radius:8px; margin-bottom:14px; }
+  .grid { display:grid; grid-template-columns:repeat(auto-fit, minmax(220px, 1fr)); gap:12px 16px; }
+  label { display:block; font-size:13px; font-weight:600; margin-bottom:4px; }
+  input, select, textarea { width:100%; padding:8px 10px; border:1px solid #d0d5dd; border-radius:7px; font:inherit; background:#fff; }
+  label.check { display:flex; gap:8px; align-items:center; font-weight:500; }
+  label.check input { width:auto; }
+  .stats { display:grid; grid-template-columns:repeat(auto-fit, minmax(150px, 1fr)); gap:12px; margin-bottom:16px; }
+  .stat { background:var(--card); border:1px solid var(--line); border-radius:10px; padding:12px 16px; }
+  .stat b { display:block; font-size:22px; }
+</style>
+</head>
+<body>
+<header><div class="wrap">
+  <strong>{{ business_name }}</strong>
+  {% set ep = request.endpoint or '' %}
+  <a href="{{ url_for('dashboard') }}" class="{{ 'on' if ep == 'dashboard' }}">Dashboard</a>
+  <a href="{{ url_for('tenants') }}" class="{{ 'on' if 'tenant' in ep }}">Tenants</a>
+  <a href="{{ url_for('units') }}" class="{{ 'on' if 'unit' in ep }}">Units</a>
+  <a href="{{ url_for('service') }}" class="{{ 'on' if 'service' in ep }}">Servicing</a>
+  <a href="{{ url_for('payment_form') }}" class="btn sm" style="color:#fff;background:#2d5aa8">+ Payment</a>
+</div></header>
+<main class="wrap">
+  {% for m in get_flashed_messages() %}<div class="flash">{{ m }}</div>{% endfor %}
+  {% block content %}{% endblock %}
+</main>
+</body>
+</html>

@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>{{ 'Edit tenant' if tenant else 'Add tenant' }}</h1>
+<form method="post" class="card">
+  <h2>Contact</h2>
+  <div class="grid">
+    <div><label>Full name</label><input name="name" required value="{{ tenant.name if tenant }}"></div>
+    <div><label>WhatsApp number</label><input name="whatsapp" placeholder="868-555-1234" value="{{ tenant.whatsapp if tenant and tenant.whatsapp }}"></div>
+    <div><label>Email</label><input name="email" type="email" value="{{ tenant.email if tenant and tenant.email }}"></div>
+  </div>
+  <p>
+    {% if whatsapp_on %}
+    <label class="check"><input type="checkbox" name="send_whatsapp" {{ 'checked' if not tenant or tenant.send_whatsapp }}> Send receipts and reminders by WhatsApp</label>
+    {% elif not tenant or tenant.send_whatsapp %}<input type="hidden" name="send_whatsapp" value="on">{% endif %}
+    <label class="check"><input type="checkbox" name="send_email" {{ 'checked' if not tenant or tenant.send_email }}> Send receipts and reminders by email</label>
+  </p>
+
+  <h2>Lease</h2>
+  <div class="grid">
+    <div><label>Unit</label>
+      <select name="unit_id"><option value="">-</option>
+        {% for u in units %}<option value="{{ u.id }}" {{ 'selected' if tenant and tenant.unit_id == u.id }}>{{ u.name }}</option>{% endfor %}
+      </select></div>
+    <div><label>Monthly rent (TT$)</label><input name="rent_amount" type="number" step="0.01" min="0" required value="{{ tenant.rent_amount if tenant }}"></div>
+    <div><label>Rent due on day</label><input name="rent_due_day" type="number" min="1" max="28" value="{{ tenant.rent_due_day if tenant else 1 }}"></div>
+    <div><label>Security deposit (TT$)</label><input name="deposit" type="number" step="0.01" min="0" value="{{ tenant.deposit if tenant and tenant.deposit }}"></div>
+    <div><label>Lease start</label><input name="lease_start" type="date" value="{{ tenant.lease_start if tenant and tenant.lease_start }}"></div>
+    <div><label>Lease end</label><input name="lease_end" type="date" value="{{ tenant.lease_end if tenant and tenant.lease_end }}"></div>
+  </div>
+  <p><label>Notes</label><textarea name="notes" rows="2">{{ tenant.notes if tenant and tenant.notes }}</textarea></p>
+  <p><label class="check"><input type="checkbox" name="active" {{ 'checked' if not tenant or tenant.active }}> Current tenant (untick when they move out)</label></p>
+  {% if not units %}<p class="muted">Tip: <a href="{{ url_for('unit_form') }}">add your units</a> first so you can assign one.</p>{% endif %}
+  <button class="btn">Save</button> <a href="{{ url_for('tenants') }}" class="btn ghost">Cancel</a>
+</form>
+{% endblock %}

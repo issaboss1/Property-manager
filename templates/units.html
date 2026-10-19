@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="row"><h1>Units</h1><a class="btn" href="{{ url_for('unit_form') }}">+ Add unit</a></div>
+<div class="card scroll"><table>
+  <tr><th>Unit</th><th>Address</th><th>Current tenant</th><th></th></tr>
+  {% for u in units %}
+  <tr><td><b>{{ u.name }}</b></td><td>{{ u.address or '-' }}</td>
+      <td>{{ u.tenant_name or 'Vacant' }}</td>
+      <td class="num"><a class="btn sm ghost" href="{{ url_for('unit_form', unit_id=u.id) }}">Edit</a></td></tr>
+  {% else %}
+  <tr><td colspan="4" class="muted">No units yet. Add your 4 units to get started.</td></tr>
+  {% endfor %}
+</table></div>
+{% endblock %}
